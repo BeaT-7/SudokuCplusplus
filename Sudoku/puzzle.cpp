@@ -51,6 +51,7 @@ Puzzle::~Puzzle(){
 }
 
 void Puzzle::fillField(){
+    srand(time(NULL));
     int randNum = rand() % 5;
     for (int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){

@@ -9,6 +9,7 @@
 #include <QIntValidator>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QLabel>
 #include "qlayout.h"
 
 QT_BEGIN_NAMESPACE
@@ -21,8 +22,10 @@ class MainWindow : public QMainWindow
     Puzzle * puzzle;
     QIntValidator * validInput;
     QLineEdit* inputBoxes[9][9];
+    QLabel* gameWonText;
     QPushButton* back;
     bool setup;
+    bool gameFinished;
     QString staticVal;
     QString dynamicVal;
     QString staticValInval;
@@ -42,6 +45,7 @@ private:
     void showStartScreen();
     void newInput(int i, int j);
     void colorBlocks();
+    void gameWon();
 
 };
 #endif // MAINWINDOW_H

@@ -11,18 +11,27 @@ MainWindow::MainWindow(QWidget *parent)
     puzzle = new Puzzle;
     validInput = new QIntValidator(1,9,this);
 
-    // stylesheets
+    // stylesheets for puzzles input boxes
     staticVal = "font-size:20px; background-color:LightGray; color: black;";
     staticValInval = "font-size:20px; background-color:lightcoral; color: black;";
     dynamicVal = "font-size:20px; background-color:LightGray; color: dimgray";
     dynamicValInval = "font-size:20px; background-color:lightcoral; color: dimgray;";
 
+    // Game won text
+    gameWonText = new QLabel;
+    gameWonText->hide();
+    gameWonText->setStyleSheet("font-size: 35px; color: green; font-weight: bold;");
+    gameWonText->setGeometry(170,60,500,50);
+    gameWonText->setText("Game finished, you WON!!");
+    this->layout()->addWidget(gameWonText);
+
+    // Back button
     back = new QPushButton;
-    this->layout()->addWidget(back);
     back->setGeometry(20,20,80,25);
     back->setText("Back");
     back->setStyleSheet("background-color: LightGray; font-weight: bold; font-size: 22px;");
     back->hide();
+    this->layout()->addWidget(back);
     connect(back, &QPushButton::clicked,[this](){this->showStartScreen();});
 
     int x = 230, y = 150;
@@ -69,6 +78,7 @@ void MainWindow::showStartScreen(){
         }
     }
     back->hide();
+    gameWonText->hide();
     ui->StartGameBtn->show();
 }
 
@@ -92,20 +102,23 @@ void MainWindow::startGame(){
 void MainWindow::newInput(int i, int j){
     int curVal = inputBoxes[i][j]->text().toInt();
     if (inputBoxes[i][j]->text().toInt()==0) inputBoxes[i][j]->setText(""); // blocks "0" as input
-    //bool valid = puzzle->isValid(i, j, inputBoxes[i][j]->text().toInt());
     puzzle->setValue(i, j, curVal);
-    //colorRow(i, curVal);
     if (!setup) colorBlocks();
+    if (gameFinished) gameWon();
 }
 
 void MainWindow::colorBlocks(){
+    gameFinished = true;
     for(int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){
             int val = inputBoxes[i][j]->text().toInt();
+            if (val < 1) gameFinished = false;
             if(!puzzle->isValidNum(i,j,val) && val != 0 && inputBoxes[i][j]->objectName() == "static"){
                 inputBoxes[i][j]->setStyleSheet(staticValInval);
+                gameFinished=false;
             } else if(!puzzle->isValidNum(i,j,val) && val != 0){
                 inputBoxes[i][j]->setStyleSheet(dynamicValInval);
+                gameFinished=false;
             } else if(inputBoxes[i][j]->objectName() == "static") {
                 inputBoxes[i][j]->setStyleSheet(staticVal);
             } else{
@@ -113,4 +126,13 @@ void MainWindow::colorBlocks(){
             }
         }
     }
+}
+
+void MainWindow::gameWon(){
+    for (int i = 0; i < 9; i++){
+        for (int j = 0; j < 9; j++){
+            inputBoxes[i][j]->setReadOnly(true);
+        }
+    }
+    gameWonText->show();
 }
