@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/">
+<file alias="puzzleCollection.txt">F:/Programming/C++/Sudoku/puzzleCollection.txt</file>
+</qresource>
+</RCC>
