@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->layout()->addWidget(back);
     connect(back, &QPushButton::clicked,[this](){this->showStartScreen();});
 
+    // sets up input boxes GUI and their values
     int x = 230, y = 150;
     for (int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){
@@ -46,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
             inputBoxes[i][j]->setAlignment(Qt::AlignCenter);
             inputBoxes[i][j]->hide();
             x += ((j+1)%3==0)?36:31;
+            // connects button to function
             connect(inputBoxes[i][j], &QLineEdit::textChanged,
                     [this, i, j](){this->newInput(i,j);});
         }
@@ -54,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 }
 
+// deconstructor
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -61,18 +64,21 @@ MainWindow::~MainWindow()
     delete validInput;
 }
 
+// starts game
 void MainWindow::on_StartGameBtn_clicked()
 {
-    setup = true;
-    ui->StartGameBtn->hide();
+    setup = true; // turns off value validation
+    ui->StartGameBtn->hide(); // hides start button
     this->startGame();
-    setup = false;
+    setup = false; // turns on value validation
 }
 
+// switches from game screen to start screen
 void MainWindow::showStartScreen(){
     for (int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){
-            inputBoxes[i][j]->hide();
+            inputBoxes[i][j]->hide(); // hides input boxes
+            // resets input boxes
             inputBoxes[i][j]->setReadOnly(false);
             inputBoxes[i][j]->setObjectName("box");
         }
@@ -82,13 +88,14 @@ void MainWindow::showStartScreen(){
     ui->StartGameBtn->show();
 }
 
+// sets up game field
 void MainWindow::startGame(){
-    puzzle->fillField();
+    puzzle->fillField();  // chooses new puzzle
     for (int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){
-            QString newVal = QString::number(puzzle->getFieldValue(i, j));
-            inputBoxes[i][j]->setText((newVal.toInt() < 1)?"":newVal);
-            if (newVal.toInt() > 0) {
+            QString newVal = QString::number(puzzle->getFieldValue(i, j)); // fills input boxes with starting values
+            inputBoxes[i][j]->setText((newVal.toInt() < 1)?"":newVal); // leaves field empty
+            if (newVal.toInt() > 0) { // if starting value given, sets to read only
                 inputBoxes[i][j]->setReadOnly(true);
                 inputBoxes[i][j]->setStyleSheet("font-size:20px; background-color:LightGray; color: black;");
                 inputBoxes[i][j]->setObjectName("static");
@@ -99,12 +106,13 @@ void MainWindow::startGame(){
     back->show();
 }
 
+// executed on every input box value change
 void MainWindow::newInput(int i, int j){
     int curVal = inputBoxes[i][j]->text().toInt();
     if (inputBoxes[i][j]->text().toInt()==0) inputBoxes[i][j]->setText(""); // blocks "0" as input
     puzzle->setValue(i, j, curVal);
-    if (!setup) colorBlocks();
-    if (gameFinished) gameWon();
+    if (!setup) colorBlocks(); // dissables input validation for puzzle field setup
+    if (gameFinished) gameWon(); // if no empty fields and no invalid inputs detected in colorBlocks() function, game set to won
 }
 
 void MainWindow::colorBlocks(){
@@ -112,7 +120,8 @@ void MainWindow::colorBlocks(){
     for(int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){
             int val = inputBoxes[i][j]->text().toInt();
-            if (val < 1) gameFinished = false;
+            if (val < 1) gameFinished = false; // if input box is empty, game not finished
+            // if invalid value, colors box and game not finished
             if(!puzzle->isValidNum(i,j,val) && val != 0 && inputBoxes[i][j]->objectName() == "static"){
                 inputBoxes[i][j]->setStyleSheet(staticValInval);
                 gameFinished=false;
@@ -128,11 +137,12 @@ void MainWindow::colorBlocks(){
     }
 }
 
+// executes when game is finished
 void MainWindow::gameWon(){
     for (int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){
-            inputBoxes[i][j]->setReadOnly(true);
+            inputBoxes[i][j]->setReadOnly(true); // disables input box value change
         }
     }
-    gameWonText->show();
+    gameWonText->show();// shows game won text
 }

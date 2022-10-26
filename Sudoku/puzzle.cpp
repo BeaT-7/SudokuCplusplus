@@ -3,14 +3,15 @@
 
 Puzzle::Puzzle()
 {
+    //path to .txt file of all available puzzles
     QString fullpath = QCoreApplication::applicationDirPath() + "/puzzleCollection.txt";
     puzzles = new int**[5];
     std::fstream file;
     file.open(fullpath.toStdString(), std::ios::in);
-    //file.open("puzzleCollection.txt", std::ios::in);
-    //file.open("F:/Programming/C++/Sudoku/puzzleCollection.txt", std::ios::in);
+
     char c;
     file.get(c);
+    // reads all puzzles and puts them in 3d array
     for (int i = 0; i < 5; i++){
         puzzles[i] = new int*[9];
         for (int j = 0; j < 9; j++){
@@ -25,10 +26,11 @@ Puzzle::Puzzle()
     }
     file.close();
 
+    // sets up 2d array
     field = new int*[9];
     for (int i = 0; i < 9; i++){
         field[i] = new int[9];
-    }
+    }    
     for (int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){
             field[i][j] = 0;
@@ -36,6 +38,8 @@ Puzzle::Puzzle()
     }
 
 }
+
+// deconstractor
 Puzzle::~Puzzle(){
     for (int i = 0; i < 9; i++) delete field[i];
     delete field;
@@ -50,29 +54,33 @@ Puzzle::~Puzzle(){
     delete puzzles;
 }
 
+// fills current game field with randomly chosen puzzle
 void Puzzle::fillField(){
     srand(time(NULL));
     int randNum = rand() % 5;
     for (int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){
-            field[i][j] = puzzles[randNum][i][j];
+            field[i][j] = puzzles[randNum][i][j]; // inputs values in current field
         }
     }
 }
 
+// returns value in puzzles location
 int Puzzle::getFieldValue(int i, int j){
     return field[i][j];
 }
-
+// sets value in puzzles location
 void Puzzle::setValue(int i, int j, int val){
     field[i][j] = val;
 }
 
+// checks if value is valid
 bool Puzzle::isValidNum(int row, int col, int val){
     if (isValidRow(row,col,val) && isValidCol(row,col,val) && isValidBlock(row,col,val)) return true;
     return false;
 }
 
+// checks if value is valid in its row
 bool Puzzle::isValidRow(int row, int col, int val){
     for(int i = 0; i < 9; i++){
         if (field[row][i] == val && i != col) return false;
@@ -80,6 +88,7 @@ bool Puzzle::isValidRow(int row, int col, int val){
     return true;
 }
 
+//checks if value is valid in its column
 bool Puzzle::isValidCol(int row, int col, int val){
     for(int i = 0; i < 9; i++){
         if (field[i][col] == val && i != row) return false;
@@ -87,6 +96,7 @@ bool Puzzle::isValidCol(int row, int col, int val){
     return true;
 }
 
+//checks if value is valid in its 3x3 box
 bool Puzzle::isValidBlock(int row, int col, int val){
     int blockRow = row/3*3;
     int blockCol = col/3*3;
